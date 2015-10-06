@@ -11,7 +11,7 @@ def GetTaxonomy():
 	# Parse through the sample list and obtain the taxonomies present
 
 	# The empty taxon_dic where all taxonomies will be stored
-	taxon_dic = {}
+	taxon_dic = {'total': 0}
 
 	# For each sample
 	for sample in sys.argv[4]:
@@ -69,8 +69,10 @@ def CollectSamples(taxon_dic):
 			# BLAST hit, if not increase by 1
 			if sys.argv[2] == '-A':
 				sample_dic[c_sample][' / '.join(hit[11].split(' / ')[:sys.argv[3]])] += int(hit[1])
+				sample_dic[c_sample]['total'] += int(hit[1])
 			else:
 				sample_dic[c_sample][' / '.join(hit[10].split(' / ')[:sys.argv[3]])] += 1
+				sample_dic[c_sample]['total'] += 1
 
 	# return the sample dictionary
 	return sample_dic
@@ -88,13 +90,18 @@ def PrintResults(sample_dic, taxon_dic):
 	output_file = open(sys.argv[1], 'w')
 
 	# write the output file header
-	output_file.write('Taxonomy\t{0}\n'.format('\t'.join(sample_keys)))
+	output_file.write('Taxonomy\t{0}\n'.format('\t'.join(
+		['{0}\tpercentage'.format(sample) for sample in sample_keys])))
 
-	# for taxonomy in the taxon_key list, get the abundance for each
-	# of the sample files and write this to the output file
+	# for taxonomy in the taxon_key list, get the abundance (both raw and
+	# relative abundance) for each of the sample files and write
+	# this to the output file
 	for taxonomy in taxon_keys:
-		output_file.write('{0}\t{1}\n'.format(taxonomy,
-		'\t'.join([str(sample_dic[sample][taxonomy]) for sample in sample_keys])))
+		if taxonomy == 'total': continue
+		output_file.write('{0}\t{1}\n'.format(taxonomy,'\t'.join(
+		["{0}\t{1:.3f}".format(str(sample_dic[sample][taxonomy]),(
+		float(sample_dic[sample][taxonomy])/sample_dic[sample]['total'])*100) 
+		for sample in sample_keys])))
 
 
 # Prepare the input parameters: Condense the samples to a 
