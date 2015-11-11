@@ -91,7 +91,7 @@ def PrintResults(sample_dic, taxon_dic):
 
 	# Prepare the taxonomic header
 	taxon_head = 'Kingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies'
-	sample_head = '\t'.join(['{0}\t{0} percentage'.format(sample) for sample in sample_keys])
+	sample_head = '\t'.join(['{0}\tRelative Abundance'.format(sample) for sample in sample_keys])
 
 	# write the output file header
 	output_file.write('{0}\t{1}\n'.format(taxon_head, sample_head))
